@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zelli V7 — Customer Frontend Mock</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary: 220 35% 35%;
+    --primary-fg: 210 30% 97%;
+    --accent: 38 85% 58%;
+    --accent-fg: 220 40% 15%;
+    --background: 220 20% 97%;
+    --foreground: 220 20% 20%;
+    --card: 0 0% 100%;
+    --muted: 215 15% 95%;
+    --muted-fg: 215 12% 55%;
+    --success: 152 55% 45%;
+    --warning: 38 85% 58%;
+    --destructive: 0 65% 55%;
+  }
+  body{font-family:'DM Sans',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;}
+  .font-display{font-family:'Space Grotesk',system-ui,sans-serif;}
+  .gradient-hero{background:linear-gradient(135deg,hsl(220,25%,30%),hsl(220,22%,42%));}
+  .text-gradient{background:linear-gradient(135deg,hsl(38,85%,58%),hsl(28,90%,55%));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .bg-primary{background:hsl(var(--primary));}
+  .bg-accent{background:hsl(var(--accent));}
+  .text-accent{color:hsl(var(--accent));}
+  .text-primary{color:hsl(var(--primary));}
+  .text-primary-fg{color:hsl(var(--primary-fg));}
+  .text-muted-fg{color:hsl(var(--muted-fg));}
+  .bg-card{background:hsl(var(--card));}
+  .bg-muted{background:hsl(var(--muted));}
+  .text-fg{color:hsl(var(--foreground));}
+  .bg-bg{background:hsl(var(--background));}
+  .text-success{color:hsl(var(--success));}
+  .border-border{border-color:hsl(215 15% 90%);}
+  .shadow-card{box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+  .shadow-elevated{box-shadow:0 4px 18px rgba(0,0,0,0.10);}
+  .shadow-hero{box-shadow:0 8px 32px rgba(0,0,0,0.16);}
+
+  /* Mobile frame */
+  .frame{
+    width:390px;height:844px;border-radius:42px;overflow:hidden;
+    background:hsl(var(--background));position:relative;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.5),0 0 0 12px #1e293b,0 0 0 13px #334155;
+    flex-shrink:0;
+  }
+  .frame .scroll{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .frame .scroll::-webkit-scrollbar{width:0;}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#1e293b;border-radius:0 0 16px 16px;z-index:50;}
+
+  .label{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;letter-spacing:.08em;color:#fbbf24;margin-bottom:8px;text-transform:uppercase;}
+  .step-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:#f8fafc;margin-bottom:4px;}
+  .step-sub{font-size:13px;color:#94a3b8;margin-bottom:18px;}
+
+  /* OTP boxes */
+  .otp-box{width:44px;height:54px;border:2px solid #e2e8f0;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:hsl(var(--foreground));background:white;}
+  .otp-box.filled{border-color:hsl(var(--accent));background:#fff7ed;}
+
+  /* Slide track */
+  .slide-track{position:relative;height:64px;border-radius:18px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);overflow:hidden;}
+  .slide-thumb{position:absolute;left:6px;top:6px;width:52px;height:52px;border-radius:14px;background:white;display:flex;align-items:center;justify-content:center;color:#3b82f6;}
+
+  /* Pin pulse */
+  @keyframes pulse-ring{0%{transform:scale(.8);opacity:.6;}100%{transform:scale(2.4);opacity:0;}}
+  .pulse-ring{position:absolute;inset:0;border-radius:9999px;background:hsl(var(--accent));animation:pulse-ring 2s infinite ease-out;}
+
+  /* Map */
+  .map-bg{background:
+    radial-gradient(circle at 30% 40%, rgba(251,191,36,.18) 0, transparent 30%),
+    radial-gradient(circle at 70% 60%, rgba(59,130,246,.12) 0, transparent 30%),
+    linear-gradient(135deg,#e2e8f0,#f1f5f9);
+  }
+
+  /* Service pill */
+  .pill{padding:10px 14px;border-radius:14px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;border:2px solid transparent;background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);transition:.2s;}
+  .pill.active{background:hsl(var(--accent));color:hsl(var(--accent-fg));}
+
+  /* Issue card */
+  .issue-card{position:relative;border-radius:20px;overflow:hidden;background:white;box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #e2e8f0;}
+  .issue-card .img{height:96px;background-size:cover;background-position:center;}
+
+  /* Section labels */
+  h2.frame-h{font-family:'Space Grotesk';font-weight:700;color:#f1f5f9;font-size:16px;margin-bottom:6px;}
+
+  /* Connectors */
+  .connector{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fbbf24;flex-shrink:0;}
+  .connector .line{width:2px;height:60px;background:linear-gradient(180deg,#fbbf24,transparent);}
+
+  .col-row{display:flex;gap:48px;align-items:flex-start;padding:48px;}
+  .col-row .col{display:flex;flex-direction:column;align-items:center;gap:16px;flex-shrink:0;}
+
+  .badge-amber{display:inline-flex;align-items:center;gap:4px;background:rgba(251,191,36,.12);color:#b45309;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;}
+
+  /* Hero overlay */
+  .hero-bg{position:absolute;inset:0;background-image:url('assets/hero-home.jpg');background-size:cover;background-position:center;}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,hsla(220,30%,18%,.95) 0%,hsla(220,30%,22%,.78) 50%,hsla(220,30%,18%,.97) 100%);}
+
+  .checkmark-circle{width:80px;height:80px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;color:white;font-size:42px;}
+
+  .skeleton-row{background:#f1f5f9;height:14px;border-radius:6px;margin:6px 0;}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Top header / wayfinder -->
+<header class="px-12 py-10 border-b border-slate-800/60">
+  <div class="max-w-screen-2xl mx-auto flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <p class="text-amber-400 font-display font-semibold tracking-widest text-xs uppercase mb-2">Zelli — Customer Frontend</p>
+      <h1 class="font-display font-bold text-3xl text-white">V7 Mock — Locksmith-First Flow</h1>
+      <p class="text-slate-400 text-sm mt-1">Specialist locksmith brand · Flat fixed prices for crisis jobs · Phone OTP before address · Geo-verified at the end</p>
+    </div>
+    <div class="flex gap-3 text-xs">
+      <span class="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">10 screens</span>
+      <span class="px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">Mobile 390×844</span>
+      <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30">Built off zelliapp.com</span>
+    </div>
+  </div>
+</header>
+
+<!-- Flow stages -->
+
+<!-- ROW 1: Landing → Service hub → Issue grid -->
+<section class="col-row overflow-x-auto">
+
+  <!-- 1. Landing -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">01 · Landing</p>
+      <p class="step-title">Pick your service</p>
+      <p class="step-sub">No address yet — just pick what's broken.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll relative">
+        <!-- Hero -->
+        <div class="relative h-[640px]">
+          <div class="hero-bg"></div>
+          <div class="hero-overlay"></div>
+          <!-- Nav -->
+          <div class="relative z-10 flex items-center justify-between px-6 py-5">
+            <div class="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow-md">
+              <img src="assets/zelli-logo.png" alt="ZELLI" class="w-8 h-8"/>
+            </div>
+            <div class="flex items-center gap-2 text-white/85 text-xs font-medium">
+              <a class="px-2 py-1.5">Call now</a>
+              <a class="px-2 py-1.5">How It Works</a>
+            </div>
+          </div>
+          <!-- Hero copy -->
+          <div class="relative z-10 px-6 mt-4 text-center">
+            <p class="text-amber-400 font-display font-semibold tracking-widest text-[10px] uppercase flex items-center justify-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Dallas's best locksmith · 24/7</p>
+            <h2 class="font-display font-bold text-white text-3xl leading-tight mt-3">
+              Locked out? <span class="text-gradient">We're 30&nbsp;min away.</span>
+            </h2>
+            <p class="text-white/70 text-sm mt-3 max-w-[290px] mx-auto">Personalized prices for your home. Licensed locksmiths. No surprises at the door.</p>
+
+            <!-- Live map - "23 pros active near you" -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 mt-5 border border-white/15">
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-[10px] text-white/85 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span class="font-bold">23 pros active</span> in Dallas</p>
+                <p class="text-[10px] text-white/65">Fastest pro · 12 min</p>
+              </div>
+              <div class="relative h-32 rounded-xl overflow-hidden map-bg">
+                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 320 130">
+                  <path d="M0,40 L320,42" stroke="#cbd5e1" stroke-width="14" fill="none"/>
+                  <path d="M0,90 L320,88" stroke="#cbd5e1" stroke-width="10" fill="none"/>
+                  <path d="M70,0 L75,130" stroke="#cbd5e1" stroke-width="12" fill="none"/>
+                  <path d="M180,0 L188,130" stroke="#cbd5e1" stroke-width="14" fill="none"/>
+                  <path d="M260,0 L262,130" stroke="#cbd5e1" stroke-width="10" fill="none"/>
+                </svg>
+                <!-- Pins -->
+                <div class="absolute" style="left:18%;top:25%;"><div class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white shadow"></div></div>
+                <div class="absolute" style="left:42%;top:55%;"><div class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white shadow"></div></div>
+                <div class="absolute" style="left:65%;top:30%;"><div class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white shadow"></div></div>
+                <div class="absolute" style="left:75%;top:70%;"><div class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white shadow"></div></div>
+                <div class="absolute" style="left:25%;top:75%;"><div class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white shadow"></div></div>
+                <div class="absolute" style="left:88%;top:42%;"><div class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white shadow"></div></div>
+                <!-- User pin -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <div class="relative">
+                    <div class="pulse-ring" style="background:white;"></div>
+                    <div class="w-7 h-7 rounded-full bg-white ring-4 ring-amber-400/40 flex items-center justify-center relative">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#d97706"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="text-[10px] text-white/55 mt-2 text-center">Pros that match your area appear when you book.</p>
+            </div>
+
+            <!-- Service pills - locksmith-first -->
+            <div class="bg-white rounded-3xl shadow-elevated p-5 mt-7 text-left">
+              <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 text-center">What's the crisis?</p>
+
+              <!-- Locksmith - hero card -->
+              <button class="w-full mb-2.5 flex items-center gap-3 p-4 rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50 relative">
+                <span class="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-bold tracking-widest">FLAT FEE</span>
+                <div class="w-12 h-12 rounded-xl bg-amber-400 flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-display font-bold text-slate-900 text-base">House Locksmith</div>
+                  <div class="text-[11px] text-slate-600">Lockout · Rekey · Smart locks</div>
+                  <div class="text-[10px] font-bold text-rose-600 mt-0.5">Lockout $95 · Rekey $45/lock</div>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.6"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+
+              <!-- Automotive - second card -->
+              <button class="w-full mb-2.5 flex items-center gap-3 p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-amber-300 relative">
+                <span class="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-slate-700 text-white text-[9px] font-bold tracking-widest">FROM $129</span>
+                <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M19 17h2v-3h-2v3zm-2-3v3H7v-3M5 17H3v-3h2v3zM3 14l2-6h14l2 6M7 17a2 2 0 104 0M13 17a2 2 0 104 0"/></svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-display font-bold text-slate-900 text-base">Car Locksmith</div>
+                  <div class="text-[11px] text-slate-600">Car lockout · Lost keys · Ignition</div>
+                  <div class="text-[10px] font-bold text-slate-600 mt-0.5">Car lockout $129 · Key copy $89</div>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.6"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+
+              <!-- Residential Home - smaller / muted -->
+              <button class="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/70">
+                <div class="w-9 h-9 rounded-lg bg-slate-200 flex items-center justify-center">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-display font-semibold text-slate-700 text-sm">Other home services</div>
+                  <div class="text-[10px] text-slate-500">HVAC · Garage · Plumbing — coming soon</div>
+                </div>
+                <span class="text-[10px] text-slate-500 font-bold">SOON</span>
+              </button>
+            </div>
+
+            <a class="block mt-4 text-center text-white text-sm font-bold py-3 rounded-2xl bg-emerald-500/95 shadow-elevated">
+              📞 Call now · (855) 284-6186
+            </a>
+            <p class="text-white/55 text-[11px] mt-3">Live dispatch · Licensed · Insured · Same price 24/7</p>
+          </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="bg-white py-10 px-6">
+          <p class="text-amber-500 text-[11px] font-display font-semibold tracking-widest uppercase mb-2 text-center">How It Works</p>
+          <h3 class="text-2xl font-display font-bold text-slate-900 text-center">Three steps. That's it.</h3>
+          <div class="space-y-3 mt-6">
+            <div class="rounded-2xl bg-amber-50 p-4 flex items-start gap-3">
+              <span class="font-display font-bold text-3xl text-amber-300/80 leading-none">01</span>
+              <div>
+                <p class="font-display font-bold text-slate-800 text-sm">Tell us what's broken</p>
+                <p class="text-xs text-slate-500 mt-1">Pick the issue — locked out, broken key, smart lock. No address yet.</p>
+              </div>
+            </div>
+            <div class="rounded-2xl bg-amber-50 p-4 flex items-start gap-3">
+              <span class="font-display font-bold text-3xl text-amber-300/80 leading-none">02</span>
+              <div>
+                <p class="font-display font-bold text-slate-800 text-sm">See your personalized estimate</p>
+                <p class="text-xs text-slate-500 mt-1">Calculated for your area. The number sticks once your address is verified.</p>
+              </div>
+            </div>
+            <div class="rounded-2xl bg-amber-50 p-4 flex items-start gap-3">
+              <span class="font-display font-bold text-3xl text-amber-300/80 leading-none">03</span>
+              <div>
+                <p class="font-display font-bold text-slate-800 text-sm">A licensed pro shows up</p>
+                <p class="text-xs text-slate-500 mt-1">Verified locksmith at your door in under 30 minutes — at the price you saw.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services we run -->
+        <div class="bg-slate-50 py-10 px-6">
+          <p class="text-amber-500 text-[11px] font-display font-semibold tracking-widest uppercase mb-2 text-center">What we do</p>
+          <h3 class="text-2xl font-display font-bold text-slate-900 text-center">Locksmith. Done right.</h3>
+          <p class="text-slate-500 text-xs mt-2 text-center max-w-[280px] mx-auto">Every service below has a personalized estimate before you book — and the price holds once your address is verified.</p>
+          <div class="grid grid-cols-2 gap-3 mt-5">
+            <div class="bg-white rounded-2xl p-4 border border-slate-200">
+              <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+              <p class="font-display font-bold text-slate-800 text-sm">House lockout</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Non-destructive entry · ~$95</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200">
+              <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
+              <p class="font-display font-bold text-slate-800 text-sm">Rekey locks</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">After move-in · ~$45/lock</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200">
+              <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></div>
+              <p class="font-display font-bold text-slate-800 text-sm">Smart lock install</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Yale, Schlage, SLK · ~$249</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 17H3v-3h2v3zM3 14l2-6h14l2 6M7 17a2 2 0 104 0M13 17a2 2 0 104 0"/></svg></div>
+              <p class="font-display font-bold text-slate-800 text-sm">Car key copy</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Cut on site · ~$89</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 17h2v-3h-2v3zm-2-3v3H7v-3M3 14l2-6h14l2 6"/></svg></div>
+              <p class="font-display font-bold text-slate-800 text-sm">Car lockout</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Any make/year · ~$129</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 12h6m-3-3v6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+              <p class="font-display font-bold text-slate-800 text-sm">Lost car keys</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Transponder cut + program · ~$249</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer testimonials -->
+        <div class="bg-white py-10 px-6">
+          <p class="text-amber-500 text-[11px] font-display font-semibold tracking-widest uppercase mb-2 text-center">Real customers · Real reviews</p>
+          <h3 class="text-2xl font-display font-bold text-slate-900 text-center">What Dallas says.</h3>
+          <div class="space-y-3 mt-5">
+            <div class="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 to-purple-500 flex items-center justify-center text-white font-bold text-sm">J</div>
+                <div>
+                  <p class="text-sm font-bold text-slate-800">Jamie R. · Lakewood</p>
+                  <p class="text-[10px] text-amber-500">★★★★★ · House lockout · 11 PM</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-700 leading-relaxed">"Was quoted $300 by another company. Zelli said $95 before I booked. Pro showed up in 18 minutes. $95 was the bill. Done."</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-300 to-orange-400 flex items-center justify-center text-white font-bold text-sm">M</div>
+                <div>
+                  <p class="text-sm font-bold text-slate-800">Maya P. · Plano</p>
+                  <p class="text-[10px] text-amber-500">★★★★★ · Rekey after move-in</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-700 leading-relaxed">"6 locks rekeyed for less than what one box-store pro wanted. Cleanest workmanship I've seen — and they pulled the price up before they touched a tool."</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">D</div>
+                <div>
+                  <p class="text-sm font-bold text-slate-800">Devon K. · Oak Cliff</p>
+                  <p class="text-[10px] text-amber-500">★★★★★ · Lost car keys (Honda)</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-700 leading-relaxed">"Quoted $249 — that's what I paid. Cut + programmed in my driveway. Saved a $400 dealer trip."</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats strip -->
+        <div class="gradient-hero py-10 px-6">
+          <p class="text-amber-300 text-[11px] font-display font-semibold tracking-widest uppercase mb-2 text-center">Trusted by homeowners</p>
+          <h3 class="text-2xl font-display font-bold text-white text-center">The numbers speak for themselves.</h3>
+          <div class="grid grid-cols-2 gap-5 mt-7">
+            <div class="text-center">
+              <p class="font-display font-bold text-3xl text-amber-300">1,000+</p>
+              <p class="text-[10px] text-white/60 uppercase tracking-wider mt-1">Verified pros</p>
+            </div>
+            <div class="text-center">
+              <p class="font-display font-bold text-3xl text-amber-300">40,000+</p>
+              <p class="text-[10px] text-white/60 uppercase tracking-wider mt-1">Customers served</p>
+            </div>
+            <div class="text-center">
+              <p class="font-display font-bold text-3xl text-amber-300">4.9 / 5</p>
+              <p class="text-[10px] text-white/60 uppercase tracking-wider mt-1">Average rating</p>
+            </div>
+            <div class="text-center">
+              <p class="font-display font-bold text-3xl text-amber-300">$5M+</p>
+              <p class="text-[10px] text-white/60 uppercase tracking-wider mt-1">Saved for homeowners</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Why Zelli -->
+        <div class="bg-white py-10 px-6 text-center">
+          <p class="text-amber-500 text-[11px] font-display font-semibold tracking-widest uppercase mb-2">Why Zelli locksmiths</p>
+          <h3 class="text-2xl font-display font-bold text-slate-900">The locksmith you wish you'd called the first time.</h3>
+          <p class="text-slate-500 text-sm mt-3">A real locksmith arrives in 30 minutes. The price personalizes to your home, not a generic estimate. No "we'll know once we get there." Ever.</p>
+          <div class="grid grid-cols-3 gap-3 mt-6 text-left">
+            <div class="rounded-xl bg-amber-50 p-3">
+              <p class="font-display font-bold text-slate-800 text-sm">30 min</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">Avg arrival in Dallas</p>
+            </div>
+            <div class="rounded-xl bg-amber-50 p-3">
+              <p class="font-display font-bold text-slate-800 text-sm">$0 surprises</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">Price locked once shown</p>
+            </div>
+            <div class="rounded-xl bg-amber-50 p-3">
+              <p class="font-display font-bold text-slate-800 text-sm">Licensed</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">TX DPS verified</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><span class="text-xs">▶</span></div>
+
+  <!-- 2. Service hub - Locksmith landing page (issue grid + area avg banner) -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">02 · Service hub</p>
+      <p class="step-title">Locksmith — Dallas, TX</p>
+      <p class="step-sub">Live area-average price band, then issue grid.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <!-- header gradient -->
+        <div class="gradient-hero pt-12 pb-6 px-5 text-white relative">
+          <div class="flex items-center gap-3 mb-4">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div>
+              <p class="font-display font-bold text-lg leading-none">Locksmith</p>
+              <p class="text-white/65 text-xs mt-1">Residential lock services</p>
+            </div>
+          </div>
+          <!-- Locksmith fixed-price banner -->
+          <div class="bg-white/10 backdrop-blur rounded-2xl p-4 border border-white/15">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-amber-300 text-[10px] font-display font-bold tracking-widest uppercase">Dallas flat-fee menu</p>
+              <p class="text-[10px] text-white/65 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Pros online · 12 min away</p>
+            </div>
+            <p class="font-display font-bold text-base text-white">Crisis? Tap your problem — see the exact dollar amount.</p>
+            <p class="text-[11px] text-white/55 mt-1.5">No estimates. No "depends." Same fee 8 AM or 2 AM.</p>
+          </div>
+        </div>
+
+        <!-- Issue grid -->
+        <div class="px-5 py-5">
+          <h3 class="font-display font-bold text-slate-800 text-base mb-1">Pick your fix.</h3>
+          <p class="text-xs text-slate-500 mb-3">Prices below are the flat fee. That's what you pay.</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="issue-card">
+              <div class="img" style="background-image:url('assets/svc-lock-lockout.jpg');"></div>
+              <div class="p-3">
+                <p class="font-bold text-sm text-slate-800">Locked Out</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Standard residential door</p>
+                <div class="flex items-baseline gap-1 mt-1.5"><span class="font-display font-bold text-amber-600 text-lg">$95</span><span class="text-[10px] text-slate-400">flat</span></div>
+              </div>
+            </div>
+            <div class="issue-card">
+              <div class="img" style="background-image:url('assets/svc-lock-rekey.jpg');"></div>
+              <div class="p-3">
+                <p class="font-bold text-sm text-slate-800">Rekey Locks</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">$45 per lock + trip</p>
+                <div class="flex items-baseline gap-1 mt-1.5"><span class="font-display font-bold text-amber-600 text-lg">$45</span><span class="text-[10px] text-slate-400">/lock</span></div>
+              </div>
+            </div>
+            <div class="issue-card">
+              <div class="img" style="background-image:url('assets/svc-lock-smart-lock.jpg');"></div>
+              <div class="p-3">
+                <p class="font-bold text-sm text-slate-800">Smart Lock Install</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Hardware varies</p>
+                <div class="flex items-baseline gap-1 mt-1.5"><span class="font-display font-bold text-amber-600 text-lg">$249</span><span class="text-[10px] text-slate-400">+ hardware</span></div>
+              </div>
+            </div>
+            <div class="issue-card">
+              <div class="img bg-slate-200 flex items-center justify-center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.7"><path d="M8 11V7a4 4 0 118 0v4M5 11h14v10H5z"/></svg></div>
+              <div class="p-3">
+                <p class="font-bold text-sm text-slate-800">Key Extraction</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Broken key, jammed lock</p>
+                <div class="flex items-baseline gap-1 mt-1.5"><span class="font-display font-bold text-amber-600 text-lg">$75</span><span class="text-[10px] text-slate-400">flat</span></div>
+              </div>
+            </div>
+            <div class="issue-card">
+              <div class="img bg-amber-50 flex items-center justify-center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M21 12V8a2 2 0 00-2-2h-7l-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h6"/><circle cx="17" cy="17" r="4"/><path d="M17 14v3l1.5 1.5"/></svg></div>
+              <div class="p-3">
+                <p class="font-bold text-sm text-slate-800">Key Copy on Site</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Per duplicate</p>
+                <div class="flex items-baseline gap-1 mt-1.5"><span class="font-display font-bold text-amber-600 text-lg">$25</span><span class="text-[10px] text-slate-400">/key</span></div>
+              </div>
+            </div>
+            <div class="issue-card">
+              <div class="img bg-rose-50 flex items-center justify-center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+              <div class="p-3">
+                <p class="font-bold text-sm text-slate-800">Burglary Repair</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Door + lock secure</p>
+                <div class="flex items-baseline gap-1 mt-1.5"><span class="font-display font-bold text-amber-600 text-lg">$185</span><span class="text-[10px] text-slate-400">flat</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3.5 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-bold text-sm text-slate-800">Don't see your problem?</p>
+              <p class="text-xs text-slate-500">Tap to describe it — we'll match the fix.</p>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+
+          <div class="mt-4 rounded-2xl bg-emerald-50 border border-emerald-200 p-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">✓</div>
+            <div>
+              <p class="text-xs font-bold text-emerald-800">Same flat fee, 24/7</p>
+              <p class="text-[11px] text-emerald-700">No after-hours surcharge for residential lockouts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><span class="text-xs">▶</span></div>
+
+  <!-- 3. Quote with area avg -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">03 · Personalized quote</p>
+      <p class="step-title">Lock-in price (area avg)</p>
+      <p class="step-sub">Tier + speed; "Lock in my price" CTA.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div>
+              <p class="font-display font-bold text-lg leading-none">Home Lockout</p>
+              <p class="text-white/65 text-xs mt-1">Locksmith · Dallas area</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero photo -->
+        <div class="h-44 bg-cover bg-center" style="background-image:url('assets/svc-lock-lockout.jpg');"></div>
+
+        <div class="px-5 py-5">
+          <p class="badge-amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> About this service</p>
+          <h2 class="font-display font-bold text-xl text-slate-900 mt-2">Home Lockout — Fast Entry</h2>
+          <p class="text-slate-500 text-sm mt-1.5">Locked out of your own home? Our licensed pro will get you back inside in under 30 minutes.</p>
+
+          <!-- Personalized estimate card -->
+          <div class="mt-4 p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 relative">
+            <span class="absolute -top-2 left-4 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-bold tracking-widest">PERSONALIZED ESTIMATE</span>
+            <p class="text-[11px] font-display font-bold tracking-widest text-amber-800 uppercase mt-1">Estimated for your area</p>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span class="text-slate-500 text-sm">~</span>
+              <span class="font-display font-bold text-5xl text-slate-900">$95</span>
+              <span class="text-slate-600 text-sm">may vary</span>
+            </div>
+            <p class="text-xs text-slate-700 mt-2">Standard residential lockout in Dallas typically runs $79–$129. We'll personalize the exact number once you verify your address.</p>
+            <div class="mt-3 rounded-xl bg-white/80 p-3 flex items-center gap-2.5 border border-amber-200/70">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+              <p class="text-[11px] text-slate-700 leading-tight">Final price calculated after address verification — and locked in once shown. Never higher than the upper bound.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+              <div class="rounded-lg bg-white/70 p-2">
+                <p class="text-[9px] text-slate-500 font-bold tracking-wider">ARRIVAL</p>
+                <p class="text-xs font-bold text-slate-800">~30 min</p>
+              </div>
+              <div class="rounded-lg bg-white/70 p-2">
+                <p class="text-[9px] text-slate-500 font-bold tracking-wider">PRICE LOCK</p>
+                <p class="text-xs font-bold text-slate-800">After address</p>
+              </div>
+              <div class="rounded-lg bg-white/70 p-2">
+                <p class="text-[9px] text-slate-500 font-bold tracking-wider">PAY AT</p>
+                <p class="text-xs font-bold text-slate-800">Door</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- What's included -->
+          <h3 class="font-display font-bold text-slate-800 mt-5 mb-2 text-sm">What's included</h3>
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-2 text-sm">
+            <p class="flex items-center gap-2 text-slate-700"><span class="text-emerald-500 font-bold">✓</span> Non-destructive entry attempt first</p>
+            <p class="flex items-center gap-2 text-slate-700"><span class="text-emerald-500 font-bold">✓</span> Door + frame inspection after entry</p>
+            <p class="flex items-center gap-2 text-slate-700"><span class="text-emerald-500 font-bold">✓</span> Free key re-cut on the spot if needed</p>
+            <p class="flex items-center gap-2 text-slate-700"><span class="text-emerald-500 font-bold">✓</span> Travel inside the Dallas metro</p>
+          </div>
+
+          <!-- Need it now? -->
+          <h3 class="font-display font-bold text-slate-800 mt-5 mb-2 text-sm">When do you need us?</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-rose-50 border-2 border-rose-300 p-3 text-center">
+              <p class="text-[10px] font-bold text-rose-500 mb-0.5">EMERGENCY</p>
+              <p class="font-bold text-sm text-slate-800">Now</p>
+              <p class="text-[11px] text-slate-500">Pro at door &lt; 30 min</p>
+              <p class="text-rose-600 font-bold text-sm mt-1">$95 flat</p>
+            </div>
+            <div class="rounded-2xl bg-white border-2 border-slate-200 p-3 text-center">
+              <p class="text-[10px] font-bold text-slate-500 mb-0.5">SCHEDULE</p>
+              <p class="font-bold text-sm text-slate-800">Pick a time</p>
+              <p class="text-[11px] text-slate-500">Today or tomorrow</p>
+              <p class="text-slate-600 font-bold text-sm mt-1">$95 flat</p>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2 text-center">Same flat fee. Speed doesn't change the price.</p>
+
+          <!-- Estimate breakdown -->
+          <div class="mt-5 p-4 rounded-2xl bg-white border border-slate-200">
+            <p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Estimate breakdown · Dallas</p>
+            <div class="flex items-center justify-between text-sm text-slate-600 mb-1.5">
+              <span>Lockout service</span><span>~$85</span>
+            </div>
+            <div class="flex items-center justify-between text-sm text-slate-600 mb-1.5">
+              <span>Trip / dispatch</span><span>$0 <span class="text-[10px] text-emerald-600 font-bold ml-1">included</span></span>
+            </div>
+            <div class="flex items-center justify-between text-sm text-slate-600 mb-2">
+              <span>Sales tax (8.25%)</span><span>~$10</span>
+            </div>
+            <div class="border-t border-slate-200 pt-2.5 flex items-center justify-between">
+              <span class="font-display font-bold text-slate-800">Estimated total</span>
+              <span class="font-display font-bold text-slate-800 text-2xl">~$95</span>
+            </div>
+            <p class="text-[10px] text-slate-400 text-center mt-2">Personalized to your home in the final step.</p>
+          </div>
+
+          <!-- CTA -->
+          <button class="w-full mt-4 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 font-display font-bold text-base flex items-center justify-center gap-2 shadow-elevated">
+            Get my exact price
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+          <p class="text-xs text-center text-slate-400 mt-2">Phone next · address last · no charge until job done</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ROW 2: Phone → OTP → Address+Geo -->
+<section class="col-row overflow-x-auto bg-slate-950/40">
+
+  <!-- 4. Phone -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">04 · Phone capture</p>
+      <p class="step-title">Lock the price to your phone</p>
+      <p class="step-sub">SMS OTP — no signup yet.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-white/30"></span>
+                <span class="w-2 h-2 rounded-full bg-white/30"></span>
+              </div>
+              <p class="text-white/65 text-[11px] mt-1">Step 3 of 5 · Phone</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-7">
+          <h2 class="font-display font-bold text-2xl text-slate-900 leading-tight">Save your spot — your <span class="text-amber-500">~$95</span> estimate.</h2>
+          <p class="text-slate-500 text-sm mt-2">Quick text code holds your slot. Final price is personalized once you confirm your address.</p>
+
+          <div class="mt-7">
+            <label class="text-xs font-display font-bold tracking-widest text-slate-500 uppercase">Phone number</label>
+            <div class="mt-2 flex items-center gap-2 rounded-2xl border-2 border-amber-300 bg-white p-3 shadow-card">
+              <div class="flex items-center gap-2 pl-2 pr-3 border-r border-slate-200">
+                <span class="text-2xl">🇺🇸</span><span class="text-sm font-semibold text-slate-700">+1</span>
+              </div>
+              <input class="flex-1 outline-none text-base font-semibold text-slate-800 bg-transparent" value="(214) 555-0142" />
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.4"><path d="M12 2L4 6v6c0 5 3.5 9.7 8 10 4.5-.3 8-5 8-10V6l-8-4z"/></svg> Used for SMS only · We never sell or call this</p>
+          </div>
+
+          <button class="w-full mt-7 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 font-display font-bold text-base flex items-center justify-center gap-2 shadow-elevated">
+            Send code
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+
+          <div class="mt-7 p-4 rounded-2xl bg-slate-100/70">
+            <p class="text-[11px] font-bold tracking-widest text-slate-500 uppercase mb-2">Why phone first?</p>
+            <ul class="text-xs text-slate-600 space-y-1.5">
+              <li class="flex gap-2"><span class="text-emerald-500">✓</span> Holds your estimate while you grab your address.</li>
+              <li class="flex gap-2"><span class="text-emerald-500">✓</span> The locksmith texts you their ETA + name + photo.</li>
+              <li class="flex gap-2"><span class="text-emerald-500">✓</span> Cancel free until pro starts driving.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><span class="text-xs">▶</span></div>
+
+  <!-- 5. OTP -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">05 · Verify code</p>
+      <p class="step-title">6-digit OTP</p>
+      <p class="step-sub">Auto-advance, 30s resend cooldown.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-white/30"></span>
+              </div>
+              <p class="text-white/65 text-[11px] mt-1">Step 4 of 5 · Verify</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-7 text-center">
+          <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <h2 class="font-display font-bold text-2xl text-slate-900">Enter the code</h2>
+          <p class="text-slate-500 text-sm mt-2">Sent to <span class="font-semibold text-slate-700">+1 (214) 555-0142</span></p>
+
+          <div class="flex items-center justify-center gap-2 mt-7">
+            <div class="otp-box filled">4</div>
+            <div class="otp-box filled">8</div>
+            <div class="otp-box filled">2</div>
+            <div class="otp-box filled">1</div>
+            <div class="otp-box" style="border-color:#fbbf24;"></div>
+            <div class="otp-box"></div>
+          </div>
+
+          <p class="text-xs text-slate-400 mt-5">Didn't get it? <span class="text-slate-300">Resend in 22s</span></p>
+
+          <div class="mt-8 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-left flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold">~</div>
+            <div>
+              <p class="text-sm font-bold text-emerald-800">~$95 estimate held</p>
+              <p class="text-xs text-emerald-700">Your exact price arrives next, after address.</p>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-slate-400 mt-7">Trouble? <span class="text-amber-600 underline font-semibold">Use email instead</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><span class="text-xs">▶</span></div>
+
+  <!-- 6. Address + price reveal -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">06 · Address → exact price reveal</p>
+      <p class="step-title">Where's the job?</p>
+      <p class="step-sub">After GPS verify, personalized price is calculated and revealed.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              </div>
+              <p class="text-white/65 text-[11px] mt-1">Step 5 of 5 · Address</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-6">
+          <h2 class="font-display font-bold text-2xl text-slate-900 leading-tight">Last step. Where's the job?</h2>
+          <p class="text-slate-500 text-sm mt-2">We'll cross-check with your phone's GPS to verify it's really you.</p>
+
+          <div class="mt-6">
+            <label class="text-xs font-display font-bold tracking-widest text-slate-500 uppercase">Home address</label>
+            <div class="mt-2 flex items-center gap-2 rounded-2xl border-2 border-amber-400 bg-white p-3 shadow-card">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <input class="flex-1 outline-none text-sm font-semibold text-slate-800 bg-transparent" value="5678 Elm Street, Dallas, TX 75246" />
+            </div>
+          </div>
+
+          <!-- Map preview -->
+          <div class="mt-4 rounded-2xl overflow-hidden border border-slate-200 relative h-48 map-bg">
+            <!-- streets -->
+            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 200">
+              <path d="M0,80 L400,90" stroke="#cbd5e1" stroke-width="20" fill="none"/>
+              <path d="M0,150 L400,160" stroke="#cbd5e1" stroke-width="14" fill="none"/>
+              <path d="M120,0 L130,200" stroke="#cbd5e1" stroke-width="16" fill="none"/>
+              <path d="M280,0 L290,200" stroke="#cbd5e1" stroke-width="14" fill="none"/>
+              <path d="M0,80 L400,90" stroke="#fff" stroke-width="2" stroke-dasharray="6 6" fill="none"/>
+            </svg>
+            <!-- pin -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+              <div class="relative">
+                <div class="pulse-ring"></div>
+                <div class="w-9 h-9 rounded-full bg-amber-400 ring-4 ring-amber-100 flex items-center justify-center relative">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/></svg>
+                </div>
+              </div>
+            </div>
+            <!-- coords pill -->
+            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-2 rounded-xl bg-white/90 backdrop-blur shadow-sm">
+              <p class="text-[10px] text-slate-500 font-mono">32.7945, -96.7820</p>
+              <p class="text-[10px] text-emerald-600 font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>GPS lock</p>
+            </div>
+          </div>
+
+          <!-- Verify card -->
+          <div class="mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-display font-bold text-emerald-900 text-xs">Address verified · GPS matched</p>
+              <p class="text-[10px] text-emerald-700">Now personalizing your price for this home…</p>
+            </div>
+          </div>
+
+          <!-- Personalized price reveal -->
+          <div class="mt-4 rounded-2xl bg-gradient-to-br from-amber-100 via-amber-50 to-white border-2 border-amber-400 p-5 shadow-elevated relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-amber-200/40"></div>
+            <span class="relative inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-bold tracking-widest">
+              <span class="w-1 h-1 rounded-full bg-white animate-pulse"></span>YOUR EXACT PRICE
+            </span>
+            <p class="relative text-[10px] text-amber-700 font-bold tracking-widest uppercase mt-2.5">For 5678 Elm St, Dallas</p>
+            <div class="relative flex items-baseline gap-2 mt-1">
+              <span class="font-display font-bold text-6xl text-slate-900 leading-none">$89</span>
+              <span class="text-slate-500 text-sm line-through">~$95</span>
+              <span class="text-emerald-600 text-xs font-bold">−$6</span>
+            </div>
+            <p class="relative text-xs text-slate-700 mt-2 leading-relaxed">Single deadbolt detected from your subdivision data → no upgrade needed. We saved you the high-end of the estimate.</p>
+            <div class="relative mt-3 grid grid-cols-3 gap-2 text-center">
+              <div class="rounded-lg bg-white p-2 border border-amber-200/50">
+                <p class="text-[9px] text-slate-500 font-bold tracking-wider">SERVICE</p>
+                <p class="text-xs font-bold text-slate-800">$82</p>
+              </div>
+              <div class="rounded-lg bg-white p-2 border border-amber-200/50">
+                <p class="text-[9px] text-slate-500 font-bold tracking-wider">TRIP</p>
+                <p class="text-xs font-bold text-emerald-600">Free</p>
+              </div>
+              <div class="rounded-lg bg-white p-2 border border-amber-200/50">
+                <p class="text-[9px] text-slate-500 font-bold tracking-wider">TAX</p>
+                <p class="text-xs font-bold text-slate-800">$7</p>
+              </div>
+            </div>
+            <div class="relative mt-3 rounded-xl bg-white/80 p-2.5 border border-amber-200/70 flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <p class="text-[11px] text-slate-700 leading-tight"><span class="font-bold text-emerald-700">Locked in for 30 minutes.</span> The pro arrives at this number. Period.</p>
+            </div>
+          </div>
+
+          <button class="w-full mt-4 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 font-display font-bold text-base flex items-center justify-center gap-2 shadow-elevated">
+            Confirm $89 — send the locksmith
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+
+          <p class="text-[11px] text-slate-400 text-center mt-3">Different address? <span class="text-amber-600 underline font-semibold">Edit</span> · Wrong door type? <span class="text-amber-600 underline font-semibold">Pick again</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ROW 3: Calendar → Payment → Confirmed -->
+<section class="col-row overflow-x-auto">
+
+  <!-- 7. Calendar -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">07 · Calendar</p>
+      <p class="step-title">Pick a slot</p>
+      <p class="step-sub">Same as V6, with locked-in price banner.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <p class="font-display font-bold text-lg">Schedule your job</p>
+          <p class="text-white/65 text-xs mt-1">Home Lockout · 5678 Elm Street</p>
+        </div>
+        <div class="px-5 py-5">
+          <!-- locked price -->
+          <div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-3 flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <div>
+                <p class="text-xs text-emerald-800 font-bold">$89 — your exact price</p>
+                <p class="text-[10px] text-emerald-700">Personalized · locked for 28 more min</p>
+              </div>
+            </div>
+            <p class="font-display font-bold text-emerald-700">$89</p>
+          </div>
+
+          <h3 class="font-display font-bold text-slate-800 mb-3 text-sm">Today, May 3</h3>
+          <div class="grid grid-cols-7 gap-1.5 mb-5">
+            <!-- Days -->
+            <div class="text-center text-[10px] text-slate-400 font-semibold">SAT</div>
+            <div class="text-center text-[10px] text-slate-400 font-semibold">SUN</div>
+            <div class="text-center text-[10px] text-slate-400 font-semibold">MON</div>
+            <div class="text-center text-[10px] text-slate-400 font-semibold">TUE</div>
+            <div class="text-center text-[10px] text-slate-400 font-semibold">WED</div>
+            <div class="text-center text-[10px] text-slate-400 font-semibold">THU</div>
+            <div class="text-center text-[10px] text-slate-400 font-semibold">FRI</div>
+            <div class="aspect-square rounded-lg bg-amber-400 text-amber-900 font-bold flex items-center justify-center text-sm">3</div>
+            <div class="aspect-square rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm text-slate-700">4</div>
+            <div class="aspect-square rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm text-slate-700">5</div>
+            <div class="aspect-square rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm text-slate-700">6</div>
+            <div class="aspect-square rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm text-slate-700">7</div>
+            <div class="aspect-square rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm text-slate-700">8</div>
+            <div class="aspect-square rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm text-slate-700">9</div>
+          </div>
+
+          <h3 class="font-display font-bold text-slate-800 mb-3 text-sm">Pick a time</h3>
+          <p class="text-[10px] text-slate-500 mb-2 uppercase tracking-widest font-semibold">Morning</p>
+          <div class="grid grid-cols-4 gap-2 mb-3">
+            <div class="rounded-xl bg-white border border-slate-200 py-2 text-center text-xs text-slate-700">8 AM</div>
+            <div class="rounded-xl bg-white border border-slate-200 py-2 text-center text-xs text-slate-700">9 AM</div>
+            <div class="rounded-xl bg-amber-400 text-amber-900 font-bold py-2 text-center text-xs">10 AM</div>
+            <div class="rounded-xl bg-white border border-slate-200 py-2 text-center text-xs text-slate-700">11 AM</div>
+          </div>
+          <p class="text-[10px] text-slate-500 mb-2 uppercase tracking-widest font-semibold">Afternoon</p>
+          <div class="grid grid-cols-4 gap-2">
+            <div class="rounded-xl bg-white border border-slate-200 py-2 text-center text-xs text-slate-700">1 PM</div>
+            <div class="rounded-xl bg-white border border-slate-200 py-2 text-center text-xs text-slate-700">2 PM</div>
+            <div class="rounded-xl bg-white border border-slate-200 py-2 text-center text-xs text-slate-700">3 PM</div>
+            <div class="rounded-xl bg-slate-100 py-2 text-center text-xs text-slate-400 line-through">4 PM</div>
+          </div>
+
+          <div class="slide-track mt-7">
+            <div class="absolute inset-0 flex items-center justify-center text-white font-display font-bold text-sm">Slide to confirm</div>
+            <div class="slide-thumb">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><span class="text-xs">▶</span></div>
+
+  <!-- 8. Payment -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">08 · Payment</p>
+      <p class="step-title">$1 hold today</p>
+      <p class="step-sub">Stripe SetupIntent. Real charge after job.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <p class="font-display font-bold text-lg">Authorize $1 hold</p>
+          <p class="text-white/65 text-xs mt-1">Full $89 only when the door is open</p>
+        </div>
+        <div class="px-5 py-5">
+          <!-- Quick pay -->
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            <button class="bg-black text-white rounded-xl py-3 font-bold text-sm">  Apple Pay</button>
+            <button class="bg-white border-2 border-slate-200 rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2"><span class="text-blue-500">G</span> Pay</button>
+          </div>
+          <div class="flex items-center gap-3 my-4">
+            <div class="flex-1 h-px bg-slate-200"></div>
+            <span class="text-[10px] text-slate-400 uppercase tracking-widest">or card</span>
+            <div class="flex-1 h-px bg-slate-200"></div>
+          </div>
+
+          <div class="space-y-2.5">
+            <div class="rounded-2xl bg-white border-2 border-slate-200 p-3">
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1">Name on card</p>
+              <p class="font-semibold text-slate-800 text-sm">Tamir Elazar</p>
+            </div>
+            <div class="rounded-2xl bg-white border-2 border-slate-200 p-3">
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1">Card number</p>
+              <p class="font-mono text-slate-800 text-sm tracking-wider">4242 4242 4242 4242</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="rounded-2xl bg-white border-2 border-slate-200 p-3">
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">Expiry</p>
+                <p class="font-mono text-slate-800 text-sm mt-0.5">12 / 28</p>
+              </div>
+              <div class="rounded-2xl bg-white border-2 border-slate-200 p-3">
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">CVC</p>
+                <p class="font-mono text-slate-800 text-sm mt-0.5">•••</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-amber-50 border border-amber-200 p-3.5 mt-4 flex items-start gap-2.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" class="mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+            <div>
+              <p class="text-xs font-bold text-amber-900">Not happy? You don't pay.</p>
+              <p class="text-[11px] text-amber-700">Zelli guarantee — full charge only after you sign off on the work.</p>
+            </div>
+          </div>
+
+          <div class="slide-track mt-5">
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-white font-display font-bold text-sm">Slide to authorize $1 hold</div>
+            <div class="slide-thumb">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <p class="text-[10px] text-center text-slate-400 mt-3">SSL · PCI compliant · Cancel anytime</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><span class="text-xs">▶</span></div>
+
+  <!-- 9. Confirmed -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">09 · Booking confirmed</p>
+      <p class="step-title">Pro is on the way</p>
+      <p class="step-sub">Final confirmation + tech card.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-14 pb-7 px-5 text-white text-center">
+          <div class="checkmark-circle mx-auto mb-3">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <h2 class="font-display font-bold text-2xl">Locksmith dispatched.</h2>
+          <p class="text-white/70 text-sm mt-1">Mike from Lone Star is 8 min away. Door open in ~15 min.</p>
+        </div>
+        <div class="px-5 py-5">
+          <!-- Tech card -->
+          <div class="rounded-2xl bg-white border border-slate-200 shadow-card p-4 -mt-10 relative">
+            <div class="flex items-center gap-3">
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-200 to-amber-400 flex items-center justify-center text-amber-900 font-bold text-xl">M</div>
+              <div class="flex-1">
+                <p class="font-display font-bold text-slate-800">Mike Rodriguez</p>
+                <p class="text-xs text-slate-500">Lone Star Locksmith</p>
+                <div class="flex items-center gap-3 mt-1.5">
+                  <span class="text-[10px] text-amber-600 font-bold">★ 4.96 (327)</span>
+                  <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Licensed</span>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mt-3">
+              <button class="rounded-xl bg-emerald-500 text-white py-2 text-sm font-bold flex items-center justify-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg> Call</button>
+              <button class="rounded-xl bg-blue-500 text-white py-2 text-sm font-bold flex items-center justify-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Message</button>
+            </div>
+          </div>
+
+          <!-- ETA -->
+          <div class="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200">
+            <p class="text-[10px] font-bold tracking-widest text-amber-700 uppercase">Estimated arrival</p>
+            <p class="font-display font-bold text-2xl text-slate-900 mt-1">10:42 AM <span class="text-amber-600 text-sm font-bold">in 24 min</span></p>
+            <div class="flex items-center gap-1.5 mt-2 text-[11px] text-slate-600">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Pro accepted · 8 min away
+            </div>
+          </div>
+
+          <!-- Booking details -->
+          <div class="mt-4 rounded-2xl bg-white border border-slate-200 overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+              <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Booking details</p>
+              <p class="text-[10px] text-slate-400">#ZLA-7821</p>
+            </div>
+            <div class="px-4 py-3 space-y-2 text-sm">
+              <div class="flex justify-between text-slate-600"><span>Service</span><span class="font-semibold text-slate-800">Home Lockout</span></div>
+              <div class="flex justify-between text-slate-600"><span>Address</span><span class="font-semibold text-slate-800 text-right max-w-[200px]">5678 Elm St, Dallas</span></div>
+              <div class="flex justify-between text-slate-600"><span>ETA</span><span class="font-semibold text-slate-800">10:42 AM (24 min)</span></div>
+              <div class="flex justify-between text-slate-600"><span>Your price</span><span class="font-display font-bold text-slate-800">$89</span></div>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-center text-slate-400 mt-5">Need to reschedule? <span class="text-amber-600 underline font-semibold">Tap here</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ROW 4: Edge cases -->
+<section class="col-row overflow-x-auto bg-slate-950/40">
+  <!-- 10. Edge case: GPS mismatch -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">10 · GPS mismatch</p>
+      <p class="step-title">Soft warning, can override</p>
+      <p class="step-sub">Booking from a different location? (helping a friend, etc.)</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <p class="font-display font-bold">Verify address</p>
+          </div>
+        </div>
+        <div class="px-6 py-6">
+          <h2 class="font-display font-bold text-xl text-slate-900">Heads up — your phone is 4.2 km from this address.</h2>
+          <p class="text-slate-500 text-sm mt-2">Booking for someone else (a kid, a friend)? That's fine — just confirm where the locksmith should go.</p>
+
+          <div class="mt-5 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 space-y-3">
+            <div>
+              <p class="text-[10px] text-amber-700 font-bold uppercase tracking-widest">Entered</p>
+              <p class="text-sm font-semibold text-slate-800">5678 Elm St, Dallas, TX 75246</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-amber-700 font-bold uppercase tracking-widest">Your phone is at</p>
+              <p class="text-sm font-semibold text-slate-800">~ 1234 Oak Ave, Plano, TX 75024</p>
+            </div>
+          </div>
+
+          <div class="mt-5 space-y-2">
+            <button class="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 py-3.5 font-display font-bold text-amber-900">Use entered address anyway</button>
+            <button class="w-full rounded-2xl bg-white border-2 border-slate-200 py-3.5 font-display font-bold text-slate-700">Use my current location</button>
+          </div>
+
+          <p class="text-[11px] text-center text-slate-400 mt-4">Pros need to know exactly where to go — pick one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Edge case: out of service area -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">11 · Out of service area</p>
+      <p class="step-title">Waitlist for next city</p>
+      <p class="step-sub">Address outside DFW metro.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <p class="font-display font-bold">We're not there yet.</p>
+        </div>
+        <div class="px-6 py-8 text-center">
+          <div class="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h2 class="font-display font-bold text-2xl text-slate-900">Austin, TX isn't live — yet.</h2>
+          <p class="text-slate-500 text-sm mt-3">Right now Zelli locksmiths only run in DFW. We'll text you the day a licensed pro is on your block — same flat fees, same trust.</p>
+
+          <div class="mt-6 rounded-2xl bg-white border border-slate-200 p-4 text-left">
+            <p class="text-[11px] font-bold tracking-widest text-slate-500 uppercase mb-3">Join the waitlist</p>
+            <div class="rounded-xl bg-slate-100 p-3 mb-2">
+              <p class="text-xs text-slate-400">Phone</p>
+              <p class="font-semibold text-slate-800">+1 (214) 555-0142</p>
+            </div>
+            <div class="rounded-xl bg-slate-100 p-3">
+              <p class="text-xs text-slate-400">Zip</p>
+              <p class="font-semibold text-slate-800">78701</p>
+            </div>
+          </div>
+
+          <button class="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 font-display font-bold text-base shadow-elevated">Notify me when live</button>
+
+          <p class="text-[11px] text-center text-slate-400 mt-4">We'll only ping when a verified pro is on your block.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. AI triage - locksmith specific -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">12 · Describe the problem</p>
+      <p class="step-title">Quick triage chat</p>
+      <p class="step-sub">Pinpoints fix + flat fee in one message.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white flex items-center justify-between">
+          <p class="font-display font-bold">Zelli AI</p>
+          <button class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="px-5 py-5 space-y-3">
+          <!-- bot -->
+          <div class="flex gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 text-sm">🔑</div>
+            <div class="rounded-2xl rounded-tl-sm bg-slate-100 p-3 max-w-[260px]">
+              <p class="text-sm text-slate-800">Tell me what happened with your lock — I'll match you to a fix and a flat price.</p>
+            </div>
+          </div>
+          <!-- user -->
+          <div class="flex gap-2.5 justify-end">
+            <div class="rounded-2xl rounded-tr-sm bg-amber-400 p-3 max-w-[260px]">
+              <p class="text-sm text-amber-950">My door key snapped off inside the lock when I tried to open it.</p>
+            </div>
+          </div>
+          <!-- bot -->
+          <div class="flex gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 text-sm">🔑</div>
+            <div class="rounded-2xl rounded-tl-sm bg-slate-100 p-3 max-w-[260px]">
+              <p class="text-sm text-slate-800 mb-1">That's a <span class="font-bold text-slate-900">Key Extraction</span>.</p>
+              <p class="text-xs text-slate-600 mb-2">Our pro will pull the broken half, re-cut a working key on the truck, and inspect the lock — all on site.</p>
+              <div class="rounded-xl bg-amber-50 border border-amber-200 p-2.5 mb-2.5">
+                <p class="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Flat fee</p>
+                <p class="font-display font-bold text-2xl text-slate-900">$75</p>
+                <p class="text-[10px] text-slate-500">Includes the new cut key</p>
+              </div>
+              <button class="w-full bg-amber-400 text-amber-900 rounded-xl py-2.5 font-bold text-sm">Lock in $75 — send a pro</button>
+            </div>
+          </div>
+
+          <!-- quick chips -->
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs text-slate-700 font-semibold">Locked out</button>
+            <button class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs text-slate-700 font-semibold">New keys after move-in</button>
+            <button class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs text-slate-700 font-semibold">Lock won't turn</button>
+            <button class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs text-slate-700 font-semibold">Smart lock setup</button>
+          </div>
+
+          <p class="text-[11px] text-slate-400 text-center mt-4">Powered by Zelli AI · Final price confirmed by the pro at the door</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROW 5: Service variants -->
+<section class="col-row overflow-x-auto">
+
+  <!-- 13. Car locksmith variant -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">13 · Car locksmith variant</p>
+      <p class="step-title">Vehicle ID before flat fee</p>
+      <p class="step-sub">VIN / Year+Make+Model. Dealer surcharge if applicable.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <p class="font-display font-bold">Automotive · Dallas</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur rounded-2xl p-4 mt-4 border border-white/15">
+            <p class="text-amber-300 text-[10px] font-display font-bold tracking-widest uppercase">Car locksmith — Dallas flat fees</p>
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <div><p class="text-white text-base font-bold">$129</p><p class="text-[10px] text-white/65">Car lockout</p></div>
+              <div><p class="text-white text-base font-bold">$89</p><p class="text-[10px] text-white/65">Key copy on site</p></div>
+              <div><p class="text-white text-base font-bold">$249</p><p class="text-[10px] text-white/65">Lost-all-keys (transponder)</p></div>
+              <div><p class="text-white text-base font-bold">$329</p><p class="text-[10px] text-white/65">Ignition repair</p></div>
+            </div>
+            <p class="text-[11px] text-white/55 mt-2">European / luxury vehicles may have a $50–$120 dealer surcharge — we'll confirm before dispatching.</p>
+          </div>
+        </div>
+        <div class="px-5 py-5">
+          <h3 class="font-display font-bold text-slate-800 text-base mb-1">What's the car?</h3>
+          <p class="text-xs text-slate-500 mb-3">We need this so we bring the right key blank + transponder.</p>
+          <div class="flex gap-2 mb-4">
+            <button class="flex-1 rounded-xl bg-amber-400 py-2.5 text-amber-900 font-bold text-xs">VIN</button>
+            <button class="flex-1 rounded-xl bg-white border border-slate-200 py-2.5 text-slate-600 font-bold text-xs">Year/Make</button>
+            <button class="flex-1 rounded-xl bg-white border border-slate-200 py-2.5 text-slate-600 font-bold text-xs">Plate</button>
+          </div>
+
+          <div class="rounded-2xl bg-white border-2 border-slate-200 p-4">
+            <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-1">VIN (17 characters)</p>
+            <p class="font-mono text-sm text-slate-800">1HGCM82633A123456</p>
+            <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+              <div class="rounded-lg bg-slate-50 p-2">
+                <p class="text-[10px] text-slate-400">Make</p>
+                <p class="text-xs font-bold text-slate-800">Honda</p>
+              </div>
+              <div class="rounded-lg bg-slate-50 p-2">
+                <p class="text-[10px] text-slate-400">Year</p>
+                <p class="text-xs font-bold text-slate-800">2003</p>
+              </div>
+              <div class="rounded-lg bg-slate-50 p-2">
+                <p class="text-[10px] text-slate-400">Model</p>
+                <p class="text-xs font-bold text-slate-800">Accord</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 rounded-2xl bg-emerald-50 border border-emerald-200 p-3 flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>
+            <div>
+              <p class="text-xs font-bold text-emerald-800">No dealer needed for this car</p>
+              <p class="text-[11px] text-emerald-700">2003 Honda Accord — we cut + program on site for $249 flat.</p>
+            </div>
+          </div>
+
+          <button class="w-full mt-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 font-display font-bold text-base flex items-center justify-center gap-2 shadow-elevated">
+            Lock in $249 — send the locksmith
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+          <p class="text-[11px] text-center text-slate-400 mt-2">No success, no charge — if we can't make the key, you don't pay.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. Other home services (waitlist) -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">14 · Other home services</p>
+      <p class="step-title">Waitlist — coming soon</p>
+      <p class="step-sub">HVAC / Garage / Plumbing — kept light. Locksmith stays the wedge.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-bg">
+        <div class="gradient-hero pt-12 pb-5 px-5 text-white">
+          <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <p class="font-display font-bold">Other Home Services</p>
+          </div>
+        </div>
+        <div class="px-6 py-8 text-center">
+          <div class="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+          </div>
+          <h2 class="font-display font-bold text-2xl text-slate-900">Locksmith first.<br/>The rest is coming.</h2>
+          <p class="text-slate-500 text-sm mt-3">Right now Zelli only does what we do best — locks, cars, and keys. HVAC, garage, and plumbing are next on the list. Be first to know when they're live in Dallas.</p>
+
+          <div class="mt-6 rounded-2xl bg-white border border-slate-200 p-4 text-left">
+            <p class="text-[11px] font-bold tracking-widest text-slate-500 uppercase mb-3">Pick what you'd want first</p>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50">
+                <span class="w-5 h-5 rounded-md bg-amber-400 flex items-center justify-center text-white text-xs">✓</span>
+                <span class="font-semibold text-slate-700 text-sm">HVAC repair</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50">
+                <span class="w-5 h-5 rounded-md border-2 border-slate-300"></span>
+                <span class="font-semibold text-slate-700 text-sm">Garage door</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50">
+                <span class="w-5 h-5 rounded-md bg-amber-400 flex items-center justify-center text-white text-xs">✓</span>
+                <span class="font-semibold text-slate-700 text-sm">Plumbing</span>
+              </label>
+            </div>
+          </div>
+
+          <button class="w-full mt-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 font-display font-bold text-base shadow-elevated">Notify me when live</button>
+
+          <a class="block mt-3 text-center text-amber-600 text-sm font-bold underline">← Back to locksmith services</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15. Why this price sheet -->
+  <div class="col">
+    <div class="text-center">
+      <p class="label">15 · "Why $95?" sheet</p>
+      <p class="step-title">Trust-builder modal</p>
+      <p class="step-sub">Tap the price to open.</p>
+    </div>
+    <div class="frame">
+      <div class="notch"></div>
+      <div class="scroll bg-slate-900 relative">
+        <!-- backdrop -->
+        <div class="absolute inset-0 bg-slate-900/85"></div>
+        <div class="relative z-10 h-full flex flex-col justify-end">
+          <div class="bg-white rounded-t-3xl p-6">
+            <div class="w-12 h-1 rounded-full bg-slate-200 mx-auto mb-5"></div>
+            <h3 class="font-display font-bold text-xl text-slate-900">Why exactly $95?</h3>
+            <p class="text-slate-500 text-sm mt-1.5">Same flat fee for every standard residential lockout in Dallas — day or night, weekday or weekend.</p>
+
+            <div class="mt-5 space-y-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700 font-bold">1</div>
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-slate-800">$85 — locksmith labor</p>
+                  <p class="text-[11px] text-slate-500">Pick / bypass / re-cut a key. Done in &lt;15 min.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700 font-bold">2</div>
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-slate-800">$0 trip fee</p>
+                  <p class="text-[11px] text-slate-500">Travel inside DFW metro is included.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700 font-bold">3</div>
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-slate-800">$10 — Texas tax</p>
+                  <p class="text-[11px] text-slate-500">8.25% state rate, that's it.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 rounded-2xl bg-rose-50 p-4 border border-rose-200">
+              <p class="text-[10px] font-bold tracking-widest text-rose-700 uppercase mb-2">What other locksmiths charge</p>
+              <div class="space-y-1.5 text-xs">
+                <div class="flex justify-between"><span class="text-slate-700">Big-name chain</span><span class="font-mono text-slate-500 line-through">$185</span></div>
+                <div class="flex justify-between"><span class="text-slate-700">Late-night call-outs</span><span class="font-mono text-slate-500 line-through">$220+</span></div>
+                <div class="flex justify-between"><span class="text-slate-700">"$15 lockout" scams</span><span class="font-mono text-rose-600">$300+ at door</span></div>
+                <div class="flex justify-between border-t border-rose-200 pt-1.5 mt-1.5"><span class="font-bold text-emerald-700">Zelli</span><span class="font-display font-bold text-emerald-700">$95 flat</span></div>
+              </div>
+            </div>
+
+            <button class="w-full mt-5 py-3.5 rounded-2xl bg-slate-900 text-white font-display font-bold text-base">Got it, send the locksmith</button>
+            <p class="text-[10px] text-slate-400 text-center mt-2">Same price 8 AM or 2 AM. Always.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ROW 6: Asset library -->
+<section class="px-12 py-12 border-t border-slate-800/60">
+  <div class="max-w-screen-2xl mx-auto">
+    <p class="text-amber-400 font-display font-semibold tracking-widest text-xs uppercase mb-2">Asset library</p>
+    <h2 class="font-display font-bold text-2xl text-white mb-6">All assets used in this mock</h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/hero-home.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">hero-home.jpg</p><p class="text-[10px] text-slate-500">Landing hero</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-lock-lockout.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-lock-lockout.jpg</p><p class="text-[10px] text-slate-500">Lockout issue</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-lock-rekey.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-lock-rekey.jpg</p><p class="text-[10px] text-slate-500">Rekey issue</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-lock-smart-lock.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-lock-smart-lock.jpg</p><p class="text-[10px] text-slate-500">Smart lock</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-auto-lockout.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-auto-lockout.jpg</p><p class="text-[10px] text-slate-500">Auto lockout</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-auto-key-copy.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-auto-key-copy.jpg</p><p class="text-[10px] text-slate-500">Auto key copy</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-auto-lost-keys.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-auto-lost-keys.jpg</p><p class="text-[10px] text-slate-500">Lost keys</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-hvac-diagnostic.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-hvac-diagnostic.jpg</p><p class="text-[10px] text-slate-500">HVAC diag.</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/hvac-service.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">hvac-service.jpg</p><p class="text-[10px] text-slate-500">HVAC service</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-cover bg-center" style="background-image:url('assets/svc-garage-broken-spring.jpg');"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">svc-garage-broken-spring.jpg</p><p class="text-[10px] text-slate-500">Garage spring</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-white flex items-center justify-center p-6"><img src="assets/zelli-logo.png" alt="" class="max-h-full"/></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">zelli-logo.png</p><p class="text-[10px] text-slate-500">Brand logo</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 bg-gradient-to-br from-amber-300 to-amber-500"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">--accent</p><p class="text-[10px] text-slate-500">38 85% 58%</p></div>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div class="h-32 gradient-hero"></div>
+        <div class="p-3"><p class="text-xs font-bold text-white">gradient-hero</p><p class="text-[10px] text-slate-500">220 25% 30→42</p></div>
+      </div>
+
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+        <p class="text-[10px] font-bold text-amber-400 tracking-widest uppercase mb-2">Type</p>
+        <p class="font-display font-bold text-white text-2xl">Space Grotesk</p>
+        <p class="text-slate-400 text-sm mt-1">Display + headings</p>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+        <p class="text-[10px] font-bold text-amber-400 tracking-widest uppercase mb-2">Body</p>
+        <p style="font-family:'DM Sans'" class="font-bold text-white text-2xl">DM Sans</p>
+        <p class="text-slate-400 text-sm mt-1">Paragraphs + UI labels</p>
+      </div>
+      <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+        <p class="text-[10px] font-bold text-amber-400 tracking-widest uppercase mb-2">Radius scale</p>
+        <div class="flex items-end gap-2 h-12">
+          <div class="w-8 h-12 bg-amber-400 rounded-md"></div>
+          <div class="w-8 h-12 bg-amber-400 rounded-xl"></div>
+          <div class="w-8 h-12 bg-amber-400 rounded-2xl"></div>
+          <div class="w-8 h-12 bg-amber-400 rounded-3xl"></div>
+        </div>
+        <p class="text-slate-400 text-xs mt-2">6 / 12 / 16 / 24 px</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="px-12 py-10 border-t border-slate-800/60 text-center text-slate-500 text-xs">
+  <p>Zelli V7 mock · Built off zelliapp.com · 15 screens · {{ Tamir + Samantha · 2026-05-03 }}</p>
+</footer>
+
+</body>
+</html>
